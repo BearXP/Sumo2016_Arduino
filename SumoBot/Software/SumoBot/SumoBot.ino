@@ -28,12 +28,24 @@ typedef struct {
 
 WiiChuckData control = {};
 
+void replyData(byte data) {
+    Mirf.setTADDR((byte *)"clie1");
+    Mirf.send(&data);
+}
+
+void SerialPrint(char input, int value) {
+  Serial.print("Received:\t");
+  Serial.print(input);
+  Serial.print("\t@:\t");
+  Serial.println(value);
+}
+
 void setup(){
   Serial.begin(9600);
   Mirf.spi = &MirfHardwareSpi;
   Mirf.init();
   Mirf.setRADDR((byte *)"serv1");
-  Mirf.payload = sizeof(byte);
+  Mirf.payload = sizeof(unsigned long);
   Mirf.config();
   
   Serial.println("Listening..."); 
@@ -42,22 +54,28 @@ void setup(){
 void loop(){
   byte data[Mirf.payload];
   if(!Mirf.isSending() && Mirf.dataReady()){
-    Serial.println("Got packet");
     Mirf.getData(data);
-    if( data[0] = (byte)170 )
+    control.receivingDataIndex = (control.receivingDataIndex + 1) % 4;
+    if( *data == 170 )
       control.receivingDataIndex = 0;
     else {
       switch (control.receivingDataIndex)
       {
         case 0: // x
-          control.x = data[0];       break;
+          control.x = *data;
+          SerialPrint('x', control.x);  break;
         case 1: // y
-          control.y = data[0];       break;
+          control.y = *data;
+          SerialPrint('y', control.y);  break;
         case 2: // c
-          control.cbut = data[0];    break;
+          control.cbut = *data;
+          SerialPrint('c', control.cbut);  break;
         case 3: // z
-          control.zbut = data[0];    break;
+          control.zbut = *data;
+          SerialPrint('z', control.zbut);  break;
       }
     }
+    replyData(*data);
   }
+  delay(1);
 }

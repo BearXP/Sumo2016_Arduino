@@ -14,7 +14,7 @@
  *
  * Configurable:
  * nRF24L01 - CE -> 8
- * nRF24L01 - CSN -> 7
+ * nRF24L01 - CSN -> 9
  */
 
 #include <SPI.h>
@@ -36,17 +36,33 @@ void setup()
     nunchuck_setpowerpins();
     nunchuck_init(); // send the initilization handshake
     // Setup nRF24L01
-    Mirf.cePin = 7;
-    Mirf.csnPin = 8;
+    //Mirf.cePin = 8;
+    //Mirf.csnPin = 9;
     Mirf.spi = &MirfHardwareSpi;
     Mirf.init();
     Mirf.setRADDR((byte *)"clie1");   // Config receiving address
-    Mirf.payload = sizeof(byte); // Payload must be the same
-    Mirf.channel = 10;
+    Mirf.payload = sizeof(unsigned long); // Payload must be the same
+    //Mirf.channel = 10;
     Mirf.config();
-    
-    Serial.print("WiiChuckDemo ready\n");
 }
+
+void send_data(unsigned long data) {
+  Mirf.setTADDR((byte *)"serv1");
+  Mirf.send((byte *)&data);
+  while(Mirf.isSending()){
+  }
+  delay(10);
+  unsigned long time = millis();
+  while(!Mirf.dataReady()){
+    if ( ( millis() - time ) > 1000 ) {
+      Serial.println("Timeout on response from server!");
+      return;
+    }
+  }
+  byte data_returned;
+  Mirf.getData((byte *)&data_returned);
+}
+
 
 void loop()
 {
@@ -57,16 +73,14 @@ void loop()
   zbut = (byte) nunchuck_zbutton();
   cbut = (byte) nunchuck_cbutton();
   // Send the data
-  Mirf.send((byte *)170   );   while(Mirf.isSending());
-  Mirf.send((byte *)&y   );   while(Mirf.isSending());
-  Mirf.send((byte *)&y   );   while(Mirf.isSending());
-  Mirf.send((byte *)&zbut);   while(Mirf.isSending());
-  Mirf.send((byte *)&cbut);   while(Mirf.isSending());
-  // Send over serial
-  Serial.print("X: ");      Serial.print(  x,   DEC);
-  Serial.print("\ty: ");    Serial.print(  y,   DEC);
-  Serial.print("\tzbut: "); Serial.print(  zbut,DEC);
-  Serial.print("\tcbut: "); Serial.println(cbut,DEC);
+  byte start_command = 170;
+  send_data(start_command );
+  send_data(y   );
+  send_data(y   );
+  send_data(zbut);
+  send_data(cbut);
   // Delay
-  delay(100);
+  delay(1);
 }
+
+
