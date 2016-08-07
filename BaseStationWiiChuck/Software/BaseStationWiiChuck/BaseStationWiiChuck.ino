@@ -58,6 +58,7 @@ void send_data(unsigned long data) {
       Serial.println("Timeout on response from server!");
       return;
     }
+    delay(1);
   }
   byte data_returned;
   Mirf.getData((byte *)&data_returned);
@@ -73,14 +74,12 @@ void loop()
   zbut = (byte) nunchuck_zbutton();
   cbut = (byte) nunchuck_cbutton();
   // Send the data
-  byte start_command = 170;
-  send_data(start_command );
-  send_data(y   );
-  send_data(y   );
-  send_data(zbut);
-  send_data(cbut);
+  send_data(((byte)(x/10))*10+1   );
+  send_data(((byte)(y/10))*10+2   );
+  send_data(cbut*10          +3   );
+  send_data(zbut*10          +4);
   // Delay
-  delay(1);
+  delay(10);
 }
 
 

@@ -1,0 +1,2 @@
+COM8 -> Robot      -> Server
+COM5 -> Controller -> Client
