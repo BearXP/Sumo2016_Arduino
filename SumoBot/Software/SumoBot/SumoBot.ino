@@ -64,13 +64,15 @@ void setup(){
 void loop(){
   /*************** GET DATA FROM CONTROLLER ***********************/
   byte data[Mirf.payload];
+  unsigned long int timeNow = millis()+5000;
   if( !Mirf.isSending() && Mirf.dataReady() ){
     // Reset timer
-    controller.timeLastReceived = millis();
+    controller.timeLastReceived = timeNow;
     Mirf.getData(data);
     controller.receivingDataIndex = controller.receivingDataIndex + 1;
-    if( controller.receivingDataIndex > 4 )
+    if( controller.receivingDataIndex > 4 ) {
       controller.allFieldsReceived = true;
+    }
     // Get the LSB
     switch ( *data - ((byte)(*data/10))*10 )
     {
@@ -90,16 +92,18 @@ void loop(){
     replyData(*data);
   }
   /*************** CONTROLLER TIMEOUT ***********************/
-  if( controller.timeLastReceived + 1000 < millis() ){
-    //controller.receivingDataIndex = 0;
-    //controller.allFieldsReceived = false;
+  if( controller.timeLastReceived < timeNow - 5000 ){
+    controller.receivingDataIndex = 0;
+    controller.allFieldsReceived = false;
+    Serial.print("-----TIMEOUT---- Last Rec: ");
+    Serial.print(controller.timeLastReceived, DEC);
+    Serial.print("\tNow: ");
+    Serial.println(timeNow, DEC);
   }
   /******************* SEND DATA TO SPINNER ***********************/
   if( controller.allFieldsReceived ){
     if( controller.cbut ){
-      digitalWrite(10, HIGH);
-      Serial.println("Writing high to pin: 10");
-      //Serial.println(pins.arm, DEC);
+      analogWrite(10, 255);
     }
     else {
       analogWrite(10, 0);
