@@ -1,12 +1,12 @@
 PINOUT:
 
-D3:  M1IN2
-
-D5:  M1IN1
-D6:  M2IN2
-D7:  M2IN1
+D3:  M1IN2~
+D4:  
+D5:  M1IN1~
+D6:  M2IN2~
+D7:  
 D8:  
-D9:  
-D10: Armerrcvvv
-D11: 
+D9:  M2IN1~
+D10: Armerrcvvv~
+D11: ~
 D12: 
