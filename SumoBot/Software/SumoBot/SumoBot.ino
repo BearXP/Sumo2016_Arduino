@@ -57,7 +57,7 @@ void SerialPrint(char input, int value) {
   int lastDir;
   
 void MotorDrive(int dir) {
-  const byte full_power_l = 150;
+  const byte full_power_l = 225;
   const byte full_power_r = 255;
   const byte turning_power_l = full_power_l/2;
   const byte turning_power_r = full_power_r/2;
@@ -85,20 +85,20 @@ void MotorDrive(int dir) {
       analogWrite(p_motorRightBkd, turning_power_r);
       analogWrite(p_motorRightFwd, full_power_r   );  break;
     case 4:                                           // Hard left
-      analogWrite(p_motorLeftFwd,  0              );
-      analogWrite(p_motorLeftBkd,  full_power_l   );
-      analogWrite(p_motorRightFwd, full_power_r   );
-      analogWrite(p_motorRightBkd, 0              );  break;
+      analogWrite(p_motorLeftFwd,  full_power_l   );
+      analogWrite(p_motorLeftBkd,  0              );
+      analogWrite(p_motorRightFwd, 0              );
+      analogWrite(p_motorRightBkd, full_power_r   );  break;
     case 5:                                           // No Movement
       analogWrite(p_motorLeftFwd,  full_power_l   );
       analogWrite(p_motorLeftBkd,  full_power_l   );
       analogWrite(p_motorRightFwd, full_power_r   );
       analogWrite(p_motorRightBkd, full_power_r   );  break;
     case 6:                                           // Hard right
-      analogWrite(p_motorLeftFwd,  full_power_l   );
-      analogWrite(p_motorLeftBkd,  0              );
-      analogWrite(p_motorRightFwd, 0              );
-      analogWrite(p_motorRightBkd, full_power_r   );  break;
+      analogWrite(p_motorLeftFwd,  0              );
+      analogWrite(p_motorLeftBkd,  full_power_l   );
+      analogWrite(p_motorRightFwd, full_power_r   );
+      analogWrite(p_motorRightBkd, 0              );  break;
     case 7:                                           // Forward left
       analogWrite(p_motorLeftBkd,  turning_power_l);
       analogWrite(p_motorLeftFwd,  0              );
@@ -118,10 +118,10 @@ void MotorDrive(int dir) {
 }
 
 void setup(){
-  //#ifdef DEBUG
+  #ifdef DEBUG
 	  Serial.begin(9600);
     Serial.println("Listening..."); 
-  //#endif
+  #endif
   // Setup radio
   Mirf.spi = &MirfHardwareSpi;
   Mirf.init();
@@ -178,12 +178,12 @@ void loop(){
   }
   /************************** MOVE MOTOR **************************/
   if( controller.allFieldsReceived ){
-	  int x_dir = min( max( map(controller.x, 10, 16, -1, 1), -1), 1);
-	  int y_dir = min( max( map(controller.y, 10, 16, -1, 1), -1), 1);
+	  int x_dir = min( max( map(controller.x+2, 10, 16, -1, 1), -1), 1);
+	  int y_dir = min( max( map(controller.y+2, 10, 16, -1, 1), -1), 1);
 	  MotorDrive( x_dir + 3*y_dir + 5 );
   } else {
 	  MotorDrive(5);
   }
   /**************************** DELAY *****************************/
-  delay(2);
+  delay(1);
 }

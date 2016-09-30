@@ -51,7 +51,7 @@ void send_data(unsigned long data) {
   Mirf.send((byte *)&data);
   while(Mirf.isSending()){
   }
-  delay(10);
+  delay(3);
   unsigned long time = millis();
   while(!Mirf.dataReady()){
     if ( ( millis() - time ) > 1000 ) {
@@ -74,12 +74,12 @@ void loop()
   zbut = (byte) nunchuck_zbutton();
   cbut = (byte) nunchuck_cbutton();
   // Send the data
-  send_data(((byte)(x/10))*10+1   );
-  send_data(((byte)(y/10))*10+2   );
-  send_data(cbut*10          +3   );
-  send_data(zbut*10          +4);
+  send_data(((byte)(x/10))*10+1   );  delay(2);
+  send_data(((byte)(y/10))*10+2   );  delay(2);
+  send_data(cbut*10          +3   );  delay(2);
+  send_data(zbut*10          +4   );  delay(2);
   // Delay
-  delay(10);
+  delay(40);
 }
 
 
